@@ -80,9 +80,14 @@ std::vector<std::vector<int>> distribute_by_regions(const std::vector<std::vecto
 
         std::fill(visited.begin(), visited.end(), -1);
         visited.resize(t);
+
         dist.resize(t);
+//        for (int i = 0; i < t; ++i) {
+//            std::cout << dist[i] << std::endl;
+//        }
+
         visited[source] = true;
-//        visited.push_back(source);
+
         queue.push(source);
 
         while (!queue.empty()) {
@@ -98,7 +103,6 @@ std::vector<std::vector<int>> distribute_by_regions(const std::vector<std::vecto
             }
             queue.pop();
         }
-
         for (int i = 0; i < t; ++i) {
             std::cout << i << " ";
         } std::cout << std::endl;
@@ -106,8 +110,15 @@ std::vector<std::vector<int>> distribute_by_regions(const std::vector<std::vecto
             std::cout << dist[i] << " ";
         } std::cout << std::endl;
         std::cout << std::endl;
-//        break;
-
+        int min = INFINITY;
+        int capital;
+        for (int i = 0; i < d; ++i) {
+            if (dist[i] < min) {
+                min = dist[i];
+                capital = i;
+            }
+        }
+        regions[capital].push_back(source);
     }
     return regions;
 }
@@ -186,6 +197,7 @@ int main() {
 
     // #1
     regions = distribute_by_regions(matrix_of_roads, regions, d, t);
+    print_regions(regions, d);
 
     return 0;
 
