@@ -68,58 +68,46 @@ int get_index(const std::vector<node> &city_neighbors, int city) {
 }
 
 std::vector<std::vector<int>> distribute_by_regions(const std::vector<std::vector<int>>& matrix, std::vector<std::vector<int>> regions, int d, int t) {
-    for (int i = 0; i < d; ++i)
+    for (int i = 0; i < d; ++i) {
         regions[i].push_back(i);
+    }
 
     // Find the region for each city
-    for (int i = d; i < t; ++i) {
-        std::vector<node> city_neighbors;
-        std::vector<int> visited;
+    for (int source = d; source < t; ++source) {
+        std::vector<int> dist;
+        std::vector<bool> visited;
         std::queue<int> queue;
-        
-        visited.push_back(i);
-        queue.push(i);
+
+        std::fill(visited.begin(), visited.end(), -1);
+        visited.resize(t);
+        dist.resize(t);
+        visited[source] = true;
+//        visited.push_back(source);
+        queue.push(source);
 
         while (!queue.empty()) {
-            for (int ngb = 0; ngb < t && queue.front() >= d; ++ngb) {
-
-                // The road exists between the cities
-                if (ngb != i && ngb != queue.front() && matrix[queue.front()][ngb] != 0) {
-                    
-                    int idx_queue = get_index(city_neighbors, queue.front());
-                    int idx_ngb = get_index(city_neighbors, ngb);
-                    
-                    // If we have visited this neighbor before
-                    if (std::find(visited.begin(), visited.end(), ngb) != visited.end()) { //todo
-
-                        // If the road to this city is longer than the new one.
-                        if (city_neighbors[idx_ngb].weight > city_neighbors[idx_queue].weight + matrix[queue.front()][ngb])
-                            city_neighbors[idx_ngb].weight = city_neighbors[idx_queue].weight + matrix[queue.front()][ngb];
-                    } else {
-                        // We never visited that neighbor
-                        node one{ngb, matrix[queue.front()][ngb]};
-                        if (idx_queue != -1) // todo
-                            one.weight += city_neighbors[idx_queue].weight;
-
-                        city_neighbors.push_back(one);
-                        visited.push_back(ngb);
+            for (int ngb = 0; ngb < matrix.size(); ++ngb) {
+                if (matrix[queue.front()][ngb] != 0) {
+                    // THE ROAD EXISTS
+                    if (!visited[ngb]) { // not visited
+                        visited[ngb] = true;
                         queue.push(ngb);
-
+                        dist[ngb] = dist[queue.front()] + 1;
                     }
                 }
             }
             queue.pop();
         }
 
-        int city, idx, w = INFINITY;
-        for (int j = 0; j < d; ++j) {
-            idx = get_index(city_neighbors, j);
-            if (city_neighbors[idx].weight < w) {
-                w = city_neighbors[idx].weight;
-                city = j;
-            }
-        }
-        regions[city].push_back(i);
+        for (int i = 0; i < t; ++i) {
+            std::cout << i << " ";
+        } std::cout << std::endl;
+        for (int i = 0; i < t; ++i) {
+            std::cout << dist[i] << " ";
+        } std::cout << std::endl;
+        std::cout << std::endl;
+//        break;
+
     }
     return regions;
 }
@@ -198,6 +186,8 @@ int main() {
 
     // #1
     regions = distribute_by_regions(matrix_of_roads, regions, d, t);
+
+    return 0;
 
     print_matrix(matrix_of_roads);
     print_regions(regions, d);
